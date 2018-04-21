@@ -7,7 +7,7 @@ FactoryBot.define do
     permalink 'https://www.reddit.com/r/strigil/comments/13pnu0/no_way/c762re1/'
   end
 
-  factory :reddit_comment2, class: Strigil::RedditComment do
+  factory :real_reddit_comment, class: Strigil::RedditComment do
     post_id 't1_dx6z3c9'
     username 'strigiltest'
     posted_at Time.new(2018, 5, 11, 11, 0, 1, '-04:00')

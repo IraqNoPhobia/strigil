@@ -1,13 +1,27 @@
+def configuration_for(config)
+  configuration_file = File.join(File.expand_path(__dir__), '..', 'config', config + '.yml')
+  YAML.safe_load(File.read(configuration_file))
+end
+
+ENV['DB'] ||= 'development'
 
 ###
 # DB Initialization
 ###
 
-def db_configuration
-  db_configuration_file = File.join(File.expand_path(__dir__), '..', 'db', 'config.yml')
-  YAML.safe_load(File.read(db_configuration_file))
+db_configuration = configuration_for('database')[ENV['DB']]
+
+ActiveRecord::Base.establish_connection(db_configuration)
+
+###
+# Strigil Initialization
+###
+
+strigil_configuration = configuration_for('strigil')[ENV['DB']]
+
+Strigil.configure do |config|
+  config.user_agent = strigil_configuration['user_agent']
+
+  config.reddit_username = strigil_configuration['reddit_username']
+  config.reddit_password = strigil_configuration['reddit_password']
 end
-
-ENV['DB'] ||= 'development'
-
-ActiveRecord::Base.establish_connection(db_configuration[ENV['DB']])

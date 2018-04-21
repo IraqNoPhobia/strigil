@@ -7,6 +7,7 @@ gem 'nokogiri'
 gem 'activerecord'
 gem 'standalone_migrations'
 gem 'pg'
+gem 'sidekiq'
 
 gem 'byebug'
 

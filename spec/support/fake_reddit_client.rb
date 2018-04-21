@@ -1,5 +1,5 @@
 class FakeRedditWebClient
-  def self.pull_params(permalink)
+  def self.permalink_to_json(permalink)
     {
       post_id: 't1_c762re1',
       username: 'testname',

@@ -1,3 +1,5 @@
+ENV['DB'] = 'test'
+
 require './spec/support/config/database_cleaner'
 require './spec/support/config/sidekiq'
 require './spec/support/config/strigil.rb'
@@ -17,7 +19,5 @@ RSpec.configure do |config|
 
   Kernel.srand config.seed
 end
-
-ENV['DB'] = 'test'
 
 require './spec/support/factory_bot.rb'
