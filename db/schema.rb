@@ -21,10 +21,12 @@ ActiveRecord::Schema.define(version: 2018_04_13_041953) do
     t.datetime "posted_at"
     t.text "content"
     t.string "permalink"
+    t.string "subreddit"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["permalink"], name: "index_reddit_comments_on_permalink", unique: true
     t.index ["post_id"], name: "index_reddit_comments_on_post_id", unique: true
+    t.index ["subreddit"], name: "index_reddit_comments_on_subreddit"
     t.index ["username"], name: "index_reddit_comments_on_username"
   end
 

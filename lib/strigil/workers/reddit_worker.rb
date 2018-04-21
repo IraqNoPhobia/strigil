@@ -15,9 +15,8 @@ module Strigil
           puts '---------------'
           return
         end
-
-        RedditComment.create(params)
         RedditController.pool.delete(permalink)
+        RedditComment.create(params)
       end
     end
   end

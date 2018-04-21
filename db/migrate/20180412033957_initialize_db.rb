@@ -6,6 +6,7 @@ class InitializeDb < ActiveRecord::Migration[5.2]
       t.timestamp :posted_at
       t.text      :content
       t.string    :permalink
+      t.string    :subreddit
 
       t.timestamps
     end

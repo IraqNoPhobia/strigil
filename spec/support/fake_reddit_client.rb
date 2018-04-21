@@ -5,7 +5,8 @@ class FakeRedditWebClient
       username: 'testname',
       posted_at: Time.new(2018, 4, 11, 12, 0, 0, '-04:00'),
       content: 'example content',
-      permalink: permalink
+      permalink: permalink,
+      subreddit: 'test'
     }
   end
 end

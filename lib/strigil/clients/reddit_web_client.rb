@@ -13,21 +13,22 @@ module Strigil
 
         begin
           comment = doc.css("div[data-permalink='#{tail}']").first
+
+          comment_tagline = comment.css("p[class='tagline']").first
+          post_time = comment_tagline.css('time').first[:datetime]
+
+          content_area = comment.css("div[class='md']").first
         rescue NoMethodError
           raise CommentRemovedError
         end
-
-        comment_tagline = comment.css("p[class='tagline']").first
-        post_time = comment_tagline.css('time').first[:datetime]
-
-        content_area = comment.css("div[class='md']").first
 
         {
           post_id: comment['data-fullname'],
           username: comment['data-author'],
           posted_at: Time.parse(post_time),
           content: content_area.text,
-          permalink: permalink
+          permalink: permalink,
+          subreddit: comment['data-subreddit']
         }
       end
 
@@ -45,7 +46,7 @@ module Strigil
 
         results += comment_permalinks
 
-        if next_link.nil?
+        if next_link.nil? || RedditComment.exists?(permalink: comment_permalinks)
           return results
         else
           get_comment_permalinks(target, results, next_link)
