@@ -14,8 +14,8 @@ module Strigil
 
     def archive(permalink)
       unless RedditController.pool.include?(permalink) || RedditComment.exists?(permalink: permalink)
-        RedditWorker.perform_async(permalink)
         RedditController.pool.add(permalink)
+        RedditWorker.perform_async(permalink)
       end
     end
 

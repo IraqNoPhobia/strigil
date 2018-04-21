@@ -83,11 +83,19 @@ module Strigil
         }
       end
 
+      def request_url(url)
+        url = base_url + url unless url.include?(base_url)
+
+        URI.encode(url)
+      end
+
       def new_request(url)
+        url = base_url + url unless url.include?(base_url)
+
         user_agent = Strigil.configuration.user_agent
         Nokogiri::HTML(
           open(
-            URI.encode(url),
+            request_url(url),
             request_headers
           )
         )

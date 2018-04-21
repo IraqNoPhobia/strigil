@@ -7,6 +7,7 @@ module Strigil
 
     def perform(permalink)
       unless RedditComment.exists?(permalink: permalink)
+        RedditController.pool.delete(permalink)
         begin
           params = @requester_class.permalink_to_json(permalink)
         rescue CommentRemovedError
@@ -15,7 +16,6 @@ module Strigil
           puts '---------------'
           return
         end
-        RedditController.pool.delete(permalink)
         RedditComment.create(params)
       end
     end
