@@ -21,7 +21,4 @@ strigil_configuration = configuration_for('strigil')[ENV['DB']]
 
 Strigil.configure do |config|
   config.user_agent = strigil_configuration['user_agent']
-
-  config.reddit_username = strigil_configuration['reddit_username']
-  config.reddit_password = strigil_configuration['reddit_password']
 end
