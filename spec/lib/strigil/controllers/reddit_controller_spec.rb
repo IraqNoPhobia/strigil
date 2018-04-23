@@ -23,44 +23,79 @@ RSpec.describe Strigil::RedditController do
       @controller = Strigil::RedditController.new(target)
     end
 
-    context 'input exists in model but not pool' do
-      it 'does not queue' do
-        create :reddit_comment
-        permalink = attributes_for(:reddit_comment)[:permalink]
-        expect(Strigil::RedditController.pool.size).to eq(0)
-        expect(Strigil::RedditWorker.jobs.size).to eq(0)
+    context 'one link' do
+      before(:each) do
+        @permalink = attributes_for(:reddit_comment)[:permalink]
+      end
 
-        @controller.archive(permalink)
+      context 'input exists in model but not pool' do
+        it 'does not queue' do
+          create :reddit_comment
 
-        expect(Strigil::RedditController.pool.size).to eq(0)
-        expect(Strigil::RedditWorker.jobs.size).to eq(0)
+          @controller.archive(@permalink)
+
+          expect(Strigil::RedditController.pool.size).to eq(0)
+          expect(Strigil::RedditWorker.jobs.size).to eq(0)
+        end
+      end
+
+      context 'input exists in pool but not model' do
+        it 'does not queue' do
+          Strigil::RedditController.pool.add(@permalink)
+
+          @controller.archive(@permalink)
+
+          expect(Strigil::RedditController.pool.size).to eq(1)
+          expect(Strigil::RedditWorker.jobs.size).to eq(0)
+        end
+      end
+
+      context 'input does not exist in model or pool' do
+        it 'queues' do
+          @controller.archive(@permalink)
+
+          expect(Strigil::RedditController.pool.size).to eq(1)
+          expect(Strigil::RedditWorker.jobs.size).to eq(1)
+        end
       end
     end
 
-    context 'input exists in pool but not model' do
-      it 'does not queue' do
-        permalink = attributes_for(:reddit_comment)[:permalink]
-        Strigil::RedditController.pool.add(permalink)
-        expect(Strigil::RedditController.pool.size).to eq(1)
-        expect(Strigil::RedditWorker.jobs.size).to eq(0)
-
-        @controller.archive(permalink)
-
-        expect(Strigil::RedditController.pool.size).to eq(1)
-        expect(Strigil::RedditWorker.jobs.size).to eq(0)
+    context 'multiple links' do
+      before(:each) do
+        @permas = []
+        @permas.push(attributes_for(:reddit_comment)[:permalink])
+        @permas.push(attributes_for(:reddit_comment2)[:permalink])
       end
-    end
 
-    context 'input does not exist in model or pool' do
-      it 'queues' do
-        permalink = attributes_for(:reddit_comment)[:permalink]
-        expect(Strigil::RedditController.pool.size).to eq(0)
-        expect(Strigil::RedditWorker.jobs.size).to eq(0)
+      context 'input does not exist in model or pool' do
+        it 'queues jobs from array' do
+          @controller.archive(@permas)
 
-        @controller.archive(permalink)
+          expect(Strigil::RedditController.pool.size).to eq(2)
+          expect(Strigil::RedditWorker.jobs.size).to eq(2)
+        end
+      end
 
-        expect(Strigil::RedditController.pool.size).to eq(1)
-        expect(Strigil::RedditWorker.jobs.size).to eq(1)
+      context 'input exists in model but not pool' do
+        it 'does not queue' do
+          create :reddit_comment
+
+          @controller.archive(@permas)
+
+          expect(Strigil::RedditController.pool.size).to eq(1)
+          expect(Strigil::RedditWorker.jobs.size).to eq(1)
+        end
+      end
+
+      context 'input exists in pool but not model' do
+        it 'does not queue' do
+          Strigil::RedditController.pool.add(@permas[0])
+
+          @controller.archive(@permas)
+
+          expect(Strigil::RedditController.pool.size).to eq(2)
+          expect(Strigil::RedditWorker.jobs.size).to eq(1)
+        end
       end
     end
   end

@@ -12,8 +12,10 @@ module Strigil
       @target = target
     end
 
-    def archive(permalink)
-      unless RedditController.pool.include?(permalink) || RedditComment.exists?(permalink: permalink)
+    def archive(permalinks)
+      to_queue = find_to_queue(permalinks)
+
+      to_queue.each do |permalink|
         RedditController.pool.add(permalink)
         RedditWorker.perform_async(permalink)
       end
@@ -24,6 +26,16 @@ module Strigil
       permalinks = RedditWebClient.get_comment_permalinks(target)
       permalinks.each { |link| archive(link) }
       permalinks.count
+    end
+
+    private
+
+    def find_to_queue(permalinks)
+      permalinks = [permalinks] unless permalinks.class == Array
+
+      to_queue = permalinks.reject { |n| RedditController.pool.include?(n) }
+      already_in_db = Strigil::RedditComment.where(permalink: to_queue).map(&:permalink)
+      to_queue.reject { |n| already_in_db.include?(n) }
     end
   end
 end
